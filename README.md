@@ -8,7 +8,7 @@ This repository contains the training and evaluation workflow used to:
 - compare **Gaussian (Hutchinson-type) probing** vs **one-hot (column) probing**,
 - benchmark accuracy on **Test / IRC / NMS** datasets and report runtime/speed comparisons.
 
-> You will add: (i) the main notebook(s), and (ii) dataset access instructions/links.
+> We will add: (i) the main notebook(s), and (ii) dataset access instructions/links.
 
 ---
 
