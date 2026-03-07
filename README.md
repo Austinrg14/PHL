@@ -1,47 +1,173 @@
-# Projected Hessian Learning (PHL): Training & Evaluation Code
+# Projected Hessian Learning (PHL)
 
-Code and analysis notebooks for the paper **“Projected Hessian Learning (PHL): Fast Curvature Supervision for Accurate Machine-Learning Interatomic Potentials”**.
+Reference implementation of **Projected Hessian Learning (PHL)** — a fast, stochastic curvature-supervision method for training machine-learning interatomic potentials (MLIPs) using **Hessian–vector products (HVPs)** instead of full Hessian matrices.
 
-This repository contains the training and evaluation workflow used to:
-- train **ANI-style neural network potentials** with **energy + forces** (E–F),
-- add **second-order supervision** via **Hessian–vector products (HVPs)** using **Projected Hessian Learning (PHL)**,
-- compare **Gaussian (Hutchinson-type) probing** vs **one-hot (column) probing**,
-- benchmark accuracy on **Test / IRC / NMS** datasets and report runtime/speed comparisons.
+PHL replaces explicit Hessian supervision with projected curvature targets of the form \(Hv\), enabling second-order training at **force-like** computational cost.
 
-> We will add: (i) the main notebook(s), and (ii) dataset access instructions/links.
+> **Paper:** *Projected Hessian Learning (PHL): Fast Curvature Supervision for Accurate Machine-Learning Interatomic Potentials* (arXiv / submitted to IOP **Machine Learning: Science and Technology (MLST)**)
 
 ---
 
-## Contents
+## What’s in this repository
 
-- [What is PHL?](#what-is-phl)
-- [Repository layout](#repository-layout)
-- [Installation](#installation)
-- [Dataset access](#dataset-access)
-- [Quickstart (Notebook)](#quickstart-notebook)
-- [Reproducing paper results](#reproducing-paper-results)
-- [Method options](#method-options)
-- [Outputs](#outputs)
-- [Citing](#citing)
-- [License](#license)
-- [Contact](#contact)
+- Training and evaluation code for ANI-style models with:
+  - **E–F** (energy + forces) baseline
+  - **E–F–HVP (PHL)** using **Gaussian (Hutchinson-type) probing**
+  - (optional) **E–F–HVP (one-hot/column)** for comparison
+  - (optional) **E–F–H** full Hessian supervision (when full Hessians are available)
+- Notebooks/scripts to reproduce:
+  - RMSE results on **Test / IRC / NMS**
+  - timing comparisons (epoch time / relative speedups)
+  - figure generation (main text + SI)
+
+> You will add the main notebook(s) and dataset access instructions (see below).
 
 ---
 
-## What is PHL?
+## Getting Started
 
-**Projected Hessian Learning (PHL)** supervises *projected curvature* of the potential energy surface by training on **HVP targets** instead of full Hessian matrices. For a probe vector \(v\), PHL matches:
+### Prerequisites
+
+Ensure the following Python packages are installed:
+
+- `torch`
+- `torchani`
+- `wandb`
+- `numpy`
+- `tqdm`
+
+> Note: this installation section is intentionally kept the same as in the companion EFH/ANI training README we used as a baseline for these workflows. fileciteturn0file0
+
+### Cloning the Repository
+
+```bash
+git clone https://github.com/<USERNAME>/<PHL-REPO-NAME>.git
+cd <PHL-REPO-NAME>
+```
+
+---
+
+## Dataset access (OpenREACT)
+
+This work uses the **OpenREACT-CHON-FH** datasets (RTP / IRC / NMS with energies, forces, and Hessians).  
+Download from Figshare:
+
+```text
+https://doi.org/10.6084/m9.figshare.29189858
+```
+
+After downloading, set an environment variable pointing to your dataset location:
+
+```bash
+export PHL_DATA_DIR=/path/to/openreact_chon_fh
+```
+
+Expected contents (edit to match your packaging):
+- RTP (reactants / transition states / products)
+- IRC (intrinsic reaction coordinate trajectories)
+- NMS (normal-mode sampled geometries)
+
+---
+
+## Running the notebook(s)
+
+Open and run the main notebook(s):
+
+```bash
+jupyter notebook
+```
+
+Suggested notebooks (rename to whatever you upload):
+- `notebooks/01_train_phl_ani.ipynb`
+- `notebooks/02_evaluate_models.ipynb`
+- `notebooks/03_make_figures.ipynb` (optional)
+
+---
+
+## Method overview (PHL)
+
+For a structure with coordinates \(\mathbf{R}\in\mathbb{R}^{3N}\), PHL trains the model energy \(\tilde{E}_\theta(\mathbf{R})\) with a combined objective:
+
 \[
-\tilde{H}v \approx Hv
+\mathcal{L} = \lambda_E\,\mathcal{L}_E + \lambda_F\,\mathcal{L}_F + \lambda_H\,\mathcal{L}_{\mathrm{HVP}}
 \]
-where \(H=\nabla^2_{\mathbf{R}} E\) is the reference Hessian and \(\tilde{H}\) is the model Hessian. Probes can be:
-- **Gaussian / Hutchinson-type:** \(v \sim \mathcal{N}(0,I)\) (random projections)
-- **One-hot / column:** \(v = \sqrt{3N} e_c\) (single column per probe)
 
-PHL provides most of the benefit of curvature supervision at **force-like cost**, avoiding explicit Hessian construction.
+where the curvature term matches projected Hessians:
+
+\[
+\mathcal{L}_{\mathrm{HVP}} \propto \mathbb{E}_{v\sim\mathcal{N}(0,I)}\left\|\tilde{H}v - Hv\right\|^2.
+\]
+
+### Probing protocols
+
+- **Randomized probes (default):** resample probe vectors each minibatch
+- **Fixed probes (data-limited):** one probe vector per structure for the whole training
 
 ---
 
-## Repository layout
+## Reproducing paper results
 
-Recommended structure (adjust as needed):
+A typical reproduction workflow:
+
+1. **Train models**
+   - E–F baseline
+   - E–F–HVP (PHL; Gaussian probes)
+   - (optional) one-hot / column probing baseline
+   - (optional) full Hessian supervision
+
+2. **Evaluate**
+   - Test set (interpolation)
+   - IRC (pathway geometries)
+   - NMS (extrapolative distortions)
+
+3. **Generate figures**
+   - RMSE summary plots (energies/forces/Hessians)
+   - Bland–Altman plots (randomized vs fixed probe regimes)
+   - timing plots
+
+All outputs (checkpoints/metrics/figures) can be written to `results/` by default.
+
+---
+
+## HIPPYNN curvature training (HIP-NN models)
+
+In addition to the ANI experiments, we implemented Hessian and HVP training functionality in **HIPPYNN** to enable curvature-supervised training of **HIP-NN** models. The upstream LANL HIPPYNN repository is available at:
+
+```text
+https://github.com/lanl/hippynn
+```
+
+An example script demonstrating the Hessian/HVP training workflow is provided here:
+
+```text
+hippynn/examples/hessian_training.py
+```
+
+---
+
+## Citation
+
+If you use this code or dataset in your work, please cite:
+
+```bibtex
+@article{rodriguez2026phl,
+  title   = {Projected Hessian Learning (PHL): Fast Curvature Supervision for Accurate Machine-Learning Interatomic Potentials},
+  author  = {Rodriguez, Austin and ...},
+  journal = {Machine Learning: Science and Technology},
+  year    = {2026},
+  note    = {submitted / arXiv preprint}
+}
+```
+
+---
+
+## License
+
+Add a `LICENSE` file (MIT or BSD-3-Clause recommended).
+
+---
+
+## Contact
+
+- Austin Rodriguez (maintainer) — <email>
+- Issues and pull requests are welcome.
