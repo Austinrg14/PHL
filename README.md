@@ -41,8 +41,8 @@ Ensure the following Python packages are installed:
 ### Cloning the Repository
 
 ```bash
-git clone https://github.com/<USERNAME>/<PHL-REPO-NAME>.git
-cd <PHL-REPO-NAME>
+git clone https://github.com/Austinrg14/PHL.git
+cd PHL
 ```
 
 ---
