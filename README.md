@@ -1,86 +1,130 @@
 # Projected Hessian Learning (PHL)
 
-Reference implementation of **Projected Hessian Learning (PHL)** — a fast, stochastic curvature-supervision method for training machine-learning interatomic potentials (MLIPs) using **Hessian–vector products (HVPs)** instead of full Hessian matrices.
+Reference implementation of **Projected Hessian Learning (PHL)**, a fast, stochastic curvature-supervision method for training machine-learning interatomic potentials (MLIPs) using **Hessian-vector products (HVPs)** instead of full Hessian matrices.
 
-PHL replaces explicit Hessian supervision with projected curvature targets of the form \(Hv\), enabling second-order training at **force-like** computational cost.
+PHL replaces explicit Hessian supervision with projected curvature targets of the form \(Hv\), enabling second-order training at force-like computational cost.
 
 > **Paper:** *Projected Hessian Learning (PHL): Fast Curvature Supervision for Accurate Machine-Learning Interatomic Potentials* (arXiv / submitted to IOP **Machine Learning: Science and Technology (MLST)**)
 
 ---
 
-## What’s in this repository
+## What's in this repository
 
-- Training and evaluation code for ANI-style models with:
-  - **E–F** (energy + forces) baseline
-  - **E–F–HVP (PHL)** using **Gaussian (Hutchinson-type) probing**
-  - (optional) **E–F–HVP (one-hot/column)** for comparison
-  - (optional) **E–F–H** full Hessian supervision (when full Hessians are available)
-- Notebooks/scripts to reproduce:
-  - RMSE results on **Test / IRC / NMS**
-  - timing comparisons (epoch time / relative speedups)
-  - figure generation (main text + SI)
-
-> You will add the main notebook(s) and dataset access instructions (see below).
+- `PHL_training.ipynb`: end-to-end ANI training workflow with **E-F-HVP (PHL)** using Gaussian (Hutchinson-type) probing.
+- `utils.py` and `__init__.py`: modified TorchANI source files required for Hessian-aware loading/batching.
+- Checkpoint outputs written to `trainings/` during notebook training runs.
 
 ---
 
-## Getting Started
+## Getting started
 
-### Prerequisites
+### Tested environment
 
-Ensure the following Python packages are installed:
+The notebook and custom Hessian training workflow were tested with:
 
-- `torch`
-- `torchani`
-- `wandb`
-- `numpy`
-- `tqdm`
+- **Python 3.12**
+- **TorchANI 2.2.4**
+- **PyTorch with CUDA 12.8**
+- `wandb`, `numpy`, `tqdm`, `h5py`
 
-> Note: this installation section is intentionally kept the same as in the companion EFH/ANI training README we used as a baseline for these workflows. fileciteturn0file0
-
-### Cloning the Repository
+Install TorchANI version:
 
 ```bash
-git clone https://github.com/Austinrg14/PHL.git
-cd PHL
+pip install torchani==2.2.4
+```
+
+Install additional required Python package:
+
+```bash
+pip install h5py
+```
+
+Install the remaining notebook dependencies:
+
+```bash
+pip install wandb numpy tqdm notebook
+```
+
+> Important: custom Hessian training in this repository does **not** work with the current unmodified upstream TorchANI package.
+
+### Required TorchANI source-file replacements (mandatory for Hessian training)
+
+To enable Hessian labels and Hessian-aware batching, replace two files in your installed TorchANI package:
+
+- `torchani/utils.py`
+- `torchani/data/__init__.py`
+
+Use the modified versions provided in this repository.
+
+These replacements are required for:
+
+- reading Hessian labels from the dataset
+- correctly formatting Hessian tensors for autograd/HVP training
+
+Find your installed TorchANI package path:
+
+```bash
+python -c "import pathlib, torchani; print(pathlib.Path(torchani.__file__).resolve().parent)"
+```
+
+Then copy the provided modified files into:
+
+- `<TORCHANI_PACKAGE_DIR>/utils.py`
+- `<TORCHANI_PACKAGE_DIR>/data/__init__.py`
+
+Make sure these files are replaced **before running the training notebook**.
+
+### Cloning the repository
+
+```bash
+git clone https://github.com/<USERNAME>/<PHL-REPO-NAME>.git
+cd <PHL-REPO-NAME>
 ```
 
 ---
 
 ## Dataset access (OpenREACT)
 
-This work uses the **OpenREACT-CHON-FH** datasets (RTP / IRC / NMS with energies, forces, and Hessians).  
-Download from Figshare:
+This work uses **OpenREACT-CHON-EFH - Open REaction Dataset of Atomic ConfiguraTions comprising C, H, O, N with Energies, Forces, and Hessians**.  
+The dataset can be downloaded from Figshare:
 
 ```text
 https://doi.org/10.6084/m9.figshare.29189858
 ```
 
-After downloading, set an environment variable pointing to your dataset location:
+In the notebook, set:
 
-```bash
-export PHL_DATA_DIR=/path/to/openreact_chon_fh
+```python
+dspath = os.path.join(path, 'path/to/dataset.h5')
 ```
 
-Expected contents (edit to match your packaging):
+to point to your downloaded `.h5` file.
+
+Expected contents (edit to match your packaging and local file layout):
+
 - RTP (reactants / transition states / products)
 - IRC (intrinsic reaction coordinate trajectories)
 - NMS (normal-mode sampled geometries)
 
 ---
 
-## Running the notebook(s)
+## Running the notebook
 
-Open and run the main notebook(s):
+After completing the TorchANI file replacements above:
 
 ```bash
-jupyter notebook
+jupyter notebook PHL_training.ipynb
 ```
 
-Suggested notebooks (rename to whatever you upload):
-- `notebooks/01_train_phl_ani.ipynb`
-- `notebooks/02_evaluate_models.ipynb`
-- `notebooks/03_make_figures.ipynb` (optional)
+Before launching training:
+
+- Set `dspath` in the notebook to your dataset `.h5` file.
+- Update `wandb.init(..., entity="<USER>", ...)` with your W&B entity name.
+- (Optional) change the W&B project name from `"PHL Training"` if needed.
+- Adjust these training controls in the training cell as needed:
+  - `training_runs`
+  - `data_percentage`
+  - `seed_number`
 
 ---
 
@@ -105,27 +149,15 @@ where the curvature term matches projected Hessians:
 
 ---
 
-## Reproducing paper results
+## Training outputs
 
-A typical reproduction workflow:
+Each training run in `PHL_training.ipynb` creates files in `trainings/`:
 
-1. **Train models**
-   - E–F baseline
-   - E–F–HVP (PHL; Gaussian probes)
-   - (optional) one-hot / column probing baseline
-   - (optional) full Hessian supervision
+- `trainings/sae_training-<run>-hvp-<pct>pct.pt`
+- `trainings/training_<run>_hvp_<pct>pct-latest.pt`
+- `trainings/training_<run>_hvp_<pct>pct-best.pt`
 
-2. **Evaluate**
-   - Test set (interpolation)
-   - IRC (pathway geometries)
-   - NMS (extrapolative distortions)
-
-3. **Generate figures**
-   - RMSE summary plots (energies/forces/Hessians)
-   - Bland–Altman plots (randomized vs fixed probe regimes)
-   - timing plots
-
-All outputs (checkpoints/metrics/figures) can be written to `results/` by default.
+Validation/test RMSE metrics are also logged to W&B for each run.
 
 ---
 
@@ -169,5 +201,5 @@ Add a `LICENSE` file (MIT or BSD-3-Clause recommended).
 
 ## Contact
 
-- Austin Rodriguez (maintainer) — <email>
+- Austin Rodriguez (maintainer) - <email>
 - Issues and pull requests are welcome.
