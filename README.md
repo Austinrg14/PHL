@@ -182,14 +182,6 @@ If you use this code or dataset in your work, please cite:
 }
 ```
 
----
-
-## License
-
-Add a `LICENSE` file (MIT or BSD-3-Clause recommended).
-
----
-
 ## Contact
 
 - Austin Rodriguez (maintainer) - arrg@msu.edu
