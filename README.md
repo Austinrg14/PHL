@@ -12,7 +12,6 @@ PHL replaces explicit Hessian supervision with projected curvature targets of th
 
 - `PHL_training.ipynb`: end-to-end ANI training workflow with **E-F-HVP (PHL)** using Gaussian (Hutchinson-type) probing.
 - `utils.py` and `__init__.py`: modified TorchANI source files required for Hessian-aware loading/batching.
-- Checkpoint outputs written to `trainings/` during notebook training runs.
 
 ---
 
