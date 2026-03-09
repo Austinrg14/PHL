@@ -192,5 +192,5 @@ Add a `LICENSE` file (MIT or BSD-3-Clause recommended).
 
 ## Contact
 
-- Austin Rodriguez (maintainer) - <email>
+- Austin Rodriguez (maintainer) - arrg@msu.edu
 - Issues and pull requests are welcome.
