@@ -4,7 +4,7 @@ Reference implementation of **Projected Hessian Learning (PHL)**, a fast, stocha
 
 PHL replaces explicit Hessian supervision with projected curvature targets of the form \(Hv\), enabling second-order training at force-like computational cost.
 
-> **Paper:** *Projected Hessian Learning (PHL): Fast Curvature Supervision for Accurate Machine-Learning Interatomic Potentials* (arXiv / submitted to IOP **Machine Learning: Science and Technology (MLST)**)
+> **Paper:** *Projected Hessian Learning (PHL): Fast Curvature Supervision for Accurate Machine-Learning Interatomic Potentials* (arXiv / submitted to IOP **Machine Learning: Science and Technology (MLS&T)**)
 
 ---
 
