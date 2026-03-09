@@ -77,8 +77,8 @@ Make sure these files are replaced **before running the training notebook**.
 ### Cloning the repository
 
 ```bash
-git clone https://github.com/<USERNAME>/<PHL-REPO-NAME>.git
-cd <PHL-REPO-NAME>
+git clone https://github.com/Austinrg14/PHL.git
+cd PHL
 ```
 
 ---
@@ -161,11 +161,14 @@ hippynn/examples/hessian_training.py
 If you use this code or dataset in your work, please cite:
 
 ```bibtex
-@article{rodriguez2026projected,
-  title={Projected Hessian Learning: Fast Curvature Supervision for Accurate Machine-Learning Interatomic Potentials},
-  author={Rodriguez, Austin and Smith, Justin S and Matin, Sakib and Lubbers, Nicholas and Barros, Kipton and Mendoza-Cortes, Jose L},
-  journal={arXiv preprint arXiv:2603.04523},
-  year={2026}
+@misc{rodriguez2026projectedhessianlearningfast,
+      title={Projected Hessian Learning: Fast Curvature Supervision for Accurate Machine-Learning Interatomic Potentials}, 
+      author={Austin Rodriguez and Justin S. Smith and Sakib Matin and Nicholas Lubbers and Kipton Barros and Jose L. Mendoza-Cortes},
+      year={2026},
+      eprint={2603.04523},
+      archivePrefix={arXiv},
+      primaryClass={physics.chem-ph},
+      url={https://arxiv.org/abs/2603.04523}, 
 }
 ```
 
