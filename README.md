@@ -172,6 +172,17 @@ If you use this code or dataset in your work, please cite:
 }
 ```
 
+```bibtex
+@misc{rodriguez2025data,
+  author = {Rodriguez, Austin and Smith, Justin S. and Mendoza-Cortes, Jose L.},
+  title = {{OpenREACT-CHON-EFH — Open REaction Dataset of Atomic ConfiguraTions comprising C, H, O, N with Energies, Forces, and Hessians}},
+  year = {2025},
+  doi = {10.6084/m9.figshare.29189858},
+  month = {5},
+  note = {Figshare dataset, doi:10.6084/m9.figshare.29189858}
+}
+```
+
 ---
 
 ## License
