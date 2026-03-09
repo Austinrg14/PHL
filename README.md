@@ -128,27 +128,6 @@ Before launching training:
 
 ---
 
-## Method overview (PHL)
-
-For a structure with coordinates \(\mathbf{R}\in\mathbb{R}^{3N}\), PHL trains the model energy \(\tilde{E}_\theta(\mathbf{R})\) with a combined objective:
-
-\[
-\mathcal{L} = \lambda_E\,\mathcal{L}_E + \lambda_F\,\mathcal{L}_F + \lambda_H\,\mathcal{L}_{\mathrm{HVP}}
-\]
-
-where the curvature term matches projected Hessians:
-
-\[
-\mathcal{L}_{\mathrm{HVP}} \propto \mathbb{E}_{v\sim\mathcal{N}(0,I)}\left\|\tilde{H}v - Hv\right\|^2.
-\]
-
-### Probing protocols
-
-- **Randomized probes (default):** resample probe vectors each minibatch
-- **Fixed probes (data-limited):** one probe vector per structure for the whole training
-
----
-
 ## Training outputs
 
 Each training run in `PHL_training.ipynb` creates files in `trainings/`:
@@ -182,12 +161,11 @@ hippynn/examples/hessian_training.py
 If you use this code or dataset in your work, please cite:
 
 ```bibtex
-@article{rodriguez2026phl,
-  title   = {Projected Hessian Learning (PHL): Fast Curvature Supervision for Accurate Machine-Learning Interatomic Potentials},
-  author  = {Rodriguez, Austin and ...},
-  journal = {Machine Learning: Science and Technology},
-  year    = {2026},
-  note    = {submitted / arXiv preprint}
+@article{rodriguez2026projected,
+  title={Projected Hessian Learning: Fast Curvature Supervision for Accurate Machine-Learning Interatomic Potentials},
+  author={Rodriguez, Austin and Smith, Justin S and Matin, Sakib and Lubbers, Nicholas and Barros, Kipton and Mendoza-Cortes, Jose L},
+  journal={arXiv preprint arXiv:2603.04523},
+  year={2026}
 }
 ```
 
